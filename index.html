@@ -44,6 +44,8 @@
         // 接続
         sock.addEventListener('open',function(e){
             console.log('Socket 接続成功');
+
+            document.getElementById('input_mic').disabled = true;
         });
 
         // サーバーからデータを受け取る
