@@ -32,6 +32,8 @@
         var chatfield = document.getElementById('messages');
         var sock = new WebSocket('wss://8hi60cct97.execute-api.us-east-1.amazonaws.com/Dev');
 
+        var from, to = undefined;
+
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             sock.send(JSON.stringify({
@@ -48,20 +50,29 @@
             document.getElementById('input_mic').disabled = true;
         });
 
+        function appendMessage(data) {
+            var li = document.createElement('li');
+            li.textContent = data;
+            chatfield.appendChild(li);
+        }
+
         // サーバーからデータを受け取る
         sock.addEventListener('message',function(e){
-            var li = document.createElement('li');
-            li.textContent = e.data;
-            chatfield.appendChild(li);
             var eventData = JSON.parse(e.data);
             switch(eventData.name) {
                 case "not_your_turn":
                     document.getElementById('input_mic').disabled = true;
+                    appendMessage(`${eventData.current.connectionId}さんの出番です`);
                     break;
                 case "your_turn":
                     document.getElementById('input_mic').disabled = false;
+                    appendMessage(`あなたの出番です ${eventData.from.lang} → ${eventData.to.lang}`);
+                    from = eventData.from;
+                    to = eventData.to;
                     break;
                 default:
+                    appendMessage(eventData);
+                    console.log(eventData);
                     break;
             }
         });
@@ -91,11 +102,23 @@
                     chunks.push(event.data);
                 });
                 recorder.addEventListener('stop', function() {
-                    sock.send({
-                        "action": "check_pass",
-                        "data": {
-                            "chunks": chunks
-                        }
+                    chunk = chunks[0];
+                    (new Promise(resolve => {
+                        let reader = new FileReader();
+                        reader.readAsDataURL(chunk);
+
+                        reader.onload = () => {
+                            resolve(reader.result)
+                        };
+                    })).then(result => {
+                        sock.send(JSON.stringify({
+                            "action": "check_pass",
+                            "data": {
+                                result,
+                                from,
+                                to,
+                            }
+                        }));
                     });
                 });
             });
