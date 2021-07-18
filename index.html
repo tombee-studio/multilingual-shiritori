@@ -70,6 +70,9 @@
                     from = eventData.from;
                     to = eventData.to;
                     break;
+                case "ok":
+                    appendMessage(`word: ${eventData.word} translated: ${eventData.translated}`);
+                    break;
                 default:
                     appendMessage(eventData);
                     console.log(eventData);
