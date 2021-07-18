@@ -30,7 +30,7 @@
 
     <script>
         var chatfield = document.getElementById('messages');
-        var sock = new WebSocket('wss://8hi60cct97.execute-api.us-east-1.amazonaws.com/Dev');
+        var sock = new WebSocket('wss://odv5ad2p46.execute-api.us-east-1.amazonaws.com/Dev');
 
         var from, to = undefined;
 
@@ -67,11 +67,9 @@
                 case "your_turn":
                     document.getElementById('input_mic').disabled = false;
                     appendMessage(`あなたの出番です ${eventData.from.lang} → ${eventData.to.lang}`);
+                    appendMessage(`word: ${eventData.word} translated: ${eventData.translated}`);
                     from = eventData.from;
                     to = eventData.to;
-                    break;
-                case "ok":
-                    appendMessage(`word: ${eventData.word} translated: ${eventData.translated}`);
                     break;
                 default:
                     appendMessage(eventData);
@@ -99,13 +97,14 @@
                     recorder.start();
                     setTimeout(function() {
                         recorder.stop();
-                    }, 2000);
+                    }, 5000);
                 });
                 recorder.addEventListener('dataavailable', function(event) {
                     chunks.push(event.data);
                 });
                 recorder.addEventListener('stop', function() {
-                    chunk = chunks[0];
+                    const chunk = chunks[0];
+                    console.log(chunks);
                     (new Promise(resolve => {
                         let reader = new FileReader();
                         reader.readAsDataURL(chunk);
