@@ -72,14 +72,14 @@
                     to = eventData.to;
                     break;
                 case "your are ok":
-                    appendMessage(`あなたは ${eventData.form.lang}で${eventData.word}と発言しました ${eventData.to.lang}で${eventData.translated}`);
+                    appendMessage(`あなたは ${eventData.word}と発言しました ${eventData.translated}`);
                     from = eventData.from;
                     to = eventData.to;
                     word = eventData.word;
                     translated = eventData.translated;
                     break;
                 case "other is ok":
-                    appendMessage(`${eventData.current.connectionId}は ${eventData.form.lang}で${eventData.word}と発言しました ${eventData.to.lang}で${eventData.translated}です`);
+                    appendMessage(`${eventData.current.connectionId}は ${eventData.word}と発言しました ${eventData.translated}です`);
                     from = eventData.from;
                     to = eventData.to;
                     word = eventData.word;
