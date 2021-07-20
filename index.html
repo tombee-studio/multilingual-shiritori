@@ -32,7 +32,8 @@
         var chatfield = document.getElementById('messages');
         var sock = new WebSocket('wss://485m7i3yy5.execute-api.us-east-1.amazonaws.com/Dev');
 
-        var from, to = undefined;
+        var from, to, word, translated = undefined;
+        var startWord = 'a';
 
         form.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -66,13 +67,25 @@
                     break;
                 case "your_turn":
                     document.getElementById('input_mic').disabled = false;
-                    appendMessage(`あなたの出番です ${eventData.from.lang} → ${eventData.to.lang}`);
-                    appendMessage(`word: ${eventData.word} translated: ${eventData.translated}`);
+                    appendMessage(`あなたの出番です ${startWord}で始まる単語を言ってください。${eventData.from.lang}語から${eventData.to.lang}語へ翻訳されます`);
                     from = eventData.from;
                     to = eventData.to;
                     break;
+                case "your are ok":
+                    appendMessage(`あなたは ${eventData.form.lang}で${eventData.word}と発言しました ${eventData.to.lang}で${eventData.translated}`);
+                    from = eventData.from;
+                    to = eventData.to;
+                    word = eventData.word;
+                    translated = eventData.translated;
+                    break;
+                case "other is ok":
+                    appendMessage(`${eventData.current.connectionId}は ${eventData.form.lang}で${eventData.word}と発言しました ${eventData.to.lang}で${eventData.translated}です`);
+                    from = eventData.from;
+                    to = eventData.to;
+                    word = eventData.word;
+                    translated = eventData.translated;
+                    break;
                 default:
-                    appendMessage(eventData);
                     console.log(eventData);
                     break;
             }
@@ -113,6 +126,7 @@
                             resolve(reader.result)
                         };
                     })).then(result => {
+                        startWord = translated != undefined ? word[translated.length - 1]: 'a';
                         sock.send(JSON.stringify({
                             "action": "check_pass",
                             "data": {
